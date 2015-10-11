@@ -1,0 +1,1162 @@
+
+class DRMapInfo extends MapInfo
+	native
+	dependson(DRSquadInfo)
+	dependson(DRGameInfoTerritories);
+
+enum EDefendingTeam
+{
+	DT_Axis<DisplayName=Axis>,
+	DT_Allies<DisplayName=Allies>,
+	DT_None<DisplayName=None>,
+	DT_Unspecified<DisplayName=Unknown>
+};
+
+var()	int 		TimeLimit16;					// Amount of Time to run this map in seconds when Max Players is 0 to 16(inclusive)
+var()	int 		TimeLimit32;					// Amount of Time to run this map in seconds when Max Players is 17 to 32(inclusive)
+var()	int 		TimeLimit64;					// Amount of Time to run this map in seconds when Max Players is 33 to 64(inclusive)
+var()	Texture2D	OverheadMapTexture;				// Texture to use for the Overhead Map
+var()	float		MaxSpawnOnSquadLeaderDistance;	// Maximum Distance in Unreal Units from the Squad Leader to attempt to Spawn a Player who selected "Spawn on Squad Leader"
+
+var()	int	MinimumTimeDead;
+var()	int	InstantRespawnInterval;
+
+var() CCSBTTree TankBehaviorTree;
+
+var(Axis)	int	AxisReinforcementCount16;		// Number of Reinforcements available for the Axis team when Max Players is 0 to 16(inclusive)
+var(Allies)	int	AlliesReinforcementCount16;		// Number of Reinforcements available for the Allies team when Max Players is 0 to 16(inclusive)
+var(Axis)	int	AxisReinforcementCount32;		// Number of Reinforcements available for the Axis team when Max Players is 17 to 32(inclusive)
+var(Allies)	int	AlliesReinforcementCount32;		// Number of Reinforcements available for the Allies team when Max Players is 17 to 32(inclusive)
+var(Axis)	int	AxisReinforcementCount64;		// Number of Reinforcements available for the Axis team when Max Players is 33 to 64(inclusive)
+var(Allies)	int	AlliesReinforcementCount64;		// Number of Reinforcements available for the Allies team when Max Players is 33 to 64(inclusive)
+
+var(Allies)	int		AlliesReinforcementDelay16;		// Allies Reinforcements when Max Players is 0 to 16(inclusive)
+var(Allies)	int		AlliesReinforcementDelay32;		// Allies Reinforcements when Max Players is 17 to 32(inclusive)
+var(Allies)	int		AlliesReinforcementDelay64;		// Allies Reinforcements when Max Players is 33 to 64(inclusive)
+var(Axis)	int		AxisReinforcementDelay16;		// Number of seconds to wait before deploying Axis Reinforcements when Max Players is 0 to 16(inclusive)
+var(Axis)	int		AxisReinforcementDelay32;		// Number of seconds to wait before deploying Axis Reinforcements when Max Players is 17 to 32(inclusive)
+var(Axis)	int		AxisReinforcementDelay64;		// Number of seconds to wait before deploying Axis Reinforcements when Max Players is 33 to 64(inclusive)
+
+var(Allies)	byte	AlliesVHReinforcementDelay16;   // Allies Vehicle Reinforcements when Max Players is 0 to 16(inclusive)
+var(Allies)	byte	AlliesVHReinforcementDelay32;  	// Allies Vehicle Reinforcements when Max Players is 17 to 32(inclusive)
+var(Allies)	byte	AlliesVHReinforcementDelay64;  	// Allies Fire Fight Reinforcements when Max Players is 33 to 64(inclusive)
+var(Axis)	byte	AxisVHReinforcementDelay16;   	// Axis Vehicle Reinforcements when Max Players is 0 to 16(inclusive)
+var(Axis)	byte	AxisVHReinforcementDelay32;   	// Axis Vehicle Reinforcements when Max Players is 17 to 32(inclusive)
+var(Axis)	byte	AxisVHReinforcementDelay64;   	// Axis Fire Fight Reinforcements when Max Players is 33 to 64(inclusive)
+
+var(Territories)	EDefendingTeam DefendingTeam;		// Used to enable attacker/defender gameplay
+
+var(Territories)	DRRole	AlliesTeamLeader;	// Allies Team Leader Role Info TE
+var(Territories)	array<instanced DRSquadInfo>	AlliesSquads;		// List of Squads available to the Allies Team TE
+
+var(Territories)	DRRole	AxisTeamLeader;		// Axis Team Leader Role Info TE
+var(Territories)	array<instanced DRSquadInfo>	AxisSquads;			// List of Squads available to the Axis Team TE
+
+
+// var(Allies)	int		AlliesFFReinforcementDelay16;   // Allies Fire Fight Reinforcements when Max Players is 0 to 16(inclusive)
+// var(Allies)	int		AlliesFFReinforcementDelay32;  	// Allies Fire Fight Reinforcements when Max Players is 17 to 32(inclusive)
+// var(Allies)	int		AlliesFFReinforcementDelay64;  	// Allies Fire Fight Reinforcements when Max Players is 33 to 64(inclusive)
+// var(Axis)	int		AxisFFReinforcementDelay16;   	// Axis Fire Fight Reinforcements when Max Players is 0 to 16(inclusive)
+// var(Axis)	int		AxisFFReinforcementDelay32;   	// Axis Fire Fight Reinforcements when Max Players is 17 to 32(inclusive)
+// var(Axis)	int		AxisFFReinforcementDelay64;   	// Axis Fire Fight Reinforcements when Max Players is 33 to 64(inclusive)
+
+// var(FireFightAxis)		array<instanced DRSquadInfo>	AxisSquadsFF;		// List of Squads available to the Axis Team FF
+// var(FireFightAllies)	array<instanced DRSquadInfo>	AlliesSquadsFF;		// List of Squads available to the Allies Team FF
+
+var	class<DRRI>	AxisDefaultRoleClass;		// Role to swap in whenever an existing role is inappropriate
+var	class<DRRI>	AlliesDefaultRoleClass;		// Role to swap in whenever an existing role is inappropriate
+
+enum EROArtilleryType
+{
+	ArtyType_Mortar,
+	ArtyType_MediumArty,
+	ArtyType_RocketArty,
+};
+
+enum EROMaxAvailableArtilleryType
+{
+	MaxArtyType_Mortar,
+	MaxArtyType_MediumArty,
+	MaxArtyType_RocketArty,
+};
+
+enum EROArtyStrikePattern
+{
+	STR_Tight,
+	STR_Normal,
+	STR_Loose,
+};
+
+enum EROArtyBatterySize
+{
+	BAT_4_to_6,
+	BAT_8_to_12,
+	BAT_15,
+};
+
+enum EROArtySalvoAmount
+{
+	SALVO_2_to_3,
+	SALVO_4_to_6,
+	SALVO_6_to_8,
+};
+
+enum EROArtyStrikeInterval
+{
+	STINT_Short_30s,
+	STINT_Med_45s,
+	STINT_Long_1m,
+	STINT_VLong_3m,
+};
+
+enum EROArtyStrikeDelay
+{
+	DELAY_Short_15s,
+	DELAY_Med_30s,
+	DELAY_Long_1m,
+	DELAY_VLong_2m,
+};
+
+struct native ArtyTypeStats
+{
+	var float 					StrikeDelay;
+	var	int						BatterySize;
+	var	int						SalvoAmount;
+	var	float 					SalvoInterval;
+	var	int						StrikePattern;
+	var class<ROArtilleryShell>	ShellClass;
+};
+
+var(Axis)			int								AxisMortarStrikeLimit16;      	// Number of mortar strikes available for the Axis team 16 Player
+var(Axis)			int								AxisMortarStrikeLimit32;      	// Number of mortar strikes available for the Axis team 16 Player
+var(Axis)			int								AxisMortarStrikeLimit64;      	// Number of mortar strikes available for the Axis team 16 Player
+var(Allies)			int								AlliesMortarStrikeLimit16;    	// Number of mortar strikes available for the Allies team 16 Player
+var(Allies)			int								AlliesMortarStrikeLimit32;    	// Number of mortar strikes available for the Allies team 16 Player
+var(Allies)			int								AlliesMortarStrikeLimit64;    	// Number of mortar strikes available for the Allies team 16 Player
+var(Axis)			int								AxisArtilleryStrikeLimit16;    	// Number of Artillery strikes available for the Axis team 32 Player
+var(Axis)			int								AxisArtilleryStrikeLimit32;    	// Number of Artillery strikes available for the Axis team 32 Player
+var(Axis)			int								AxisArtilleryStrikeLimit64;    	// Number of Artillery strikes available for the Axis team 32 Player
+var(Allies)			int								AlliesArtilleryStrikeLimit16;  	// Number of Artillery strikes available for the Allies team 32 Player
+var(Allies)			int								AlliesArtilleryStrikeLimit32;  	// Number of Artillery strikes available for the Allies team 32 Player
+var(Allies)			int								AlliesArtilleryStrikeLimit64;  	// Number of Artillery strikes available for the Allies team 32 Player
+var(Axis)			int								AxisRocketStrikeLimit16;      	// Number of rocket strikes available for the Axis team 64 Player
+var(Axis)			int								AxisRocketStrikeLimit32;      	// Number of rocket strikes available for the Axis team 64 Player
+var(Axis)			int								AxisRocketStrikeLimit64;      	// Number of rocket strikes available for the Axis team 64 Player
+var(Allies)			int								AlliesRocketStrikeLimit16;    	// Number of rocket strikes available for the Allies team 64 Player
+var(Allies)			int								AlliesRocketStrikeLimit32;    	// Number of rocket strikes available for the Allies team 64 Player
+var(Allies)			int								AlliesRocketStrikeLimit64;    	// Number of rocket strikes available for the Allies team 64 Player
+var(Axis)			EROMaxAvailableArtilleryType	AxisMaxAvailableArtilleryType;
+var(Allies)			EROMaxAvailableArtilleryType	AlliesMaxAvailableArtilleryType;
+var 				ArtyTypeStats					MortarStats;
+var 				ArtyTypeStats					MediumArtyStats;
+var 				ArtyTypeStats					RocketArtyStats;
+var(Axis)		   	EROArtyStrikeInterval			AxisArtilleryStrikeInterval;   	// Interval between Axis Artillery Strikes
+var(Allies)		   	EROArtyStrikeInterval			AlliesArtilleryStrikeInterval; 	// Interval between Allies Artillery Strikes
+
+var(Axis)	int	AxisAerialReconDelay;
+var(Allies)	int	AlliesAerialReconDelay;
+var(Axis)	int	AxisAerialReconInterval;
+var(Allies)	int	AlliesAerialReconInterval;
+
+/** Temperature effects pawn types and weapon overheating */
+var()		int TempCelsius;
+
+/** North direction offset for the compass */
+var()		int NorthOffset;	//360 degrees
+
+/** Map viewpoints used by spectators */
+var()		array<CameraActor>		MapViewpoints;
+
+// Contains references to all shared content for this map
+var array<object> SharedContentReferences;
+
+// The largest shooting distance for this map in uu (from one corner of the playable are to the opposite corner)
+var transient float MaxShootingRange;
+
+var()		int	DestructableMaxViewRange; 			//Maximum distance you can see a destructable obstacle in the tac view as engineer
+
+/** Have the squads already been initialized (prevent duplicates) */
+var transient bool bInitializedSquads;
+
+// Get a cached pre-composited mesh for the given source meshes. If one doesn't already exist, create it and cache if for future calls
+native final function SkeletalMesh GetCachedCompositedPawnMesh(SkeletalMesh FieldgearMesh, SkeletalMesh TunicMesh);
+// Clear all the cached composited meshes
+native final function DestroyCachedCompositedPawnMeshes();
+
+static function string GetLocalizedMapName( optional bool bIncludePrefix )
+{
+	local string MapName;
+	
+	MapName = class'Engine'.static.GetCurrentWorldInfo().GetMapName( bIncludePrefix );
+	
+	return MapName;
+}
+
+// function InitSquadsForGametype(class<GameInfo> GameTypeClass)
+// {
+	// local int i;
+
+	// if ( bInitializedSquads )
+	// {
+		// return;
+	// }
+	
+	// bInitializedSquads = true;
+	
+	// if ( GameTypeClass.static.GetGameType() == ROGT_Firefight && AxisSquadsFF.Length >= 1 )
+	// {
+		// AxisSquads.Remove(0, AxisSquads.Length);
+		// AlliesSquads.Remove(0, AlliesSquads.Length);
+
+		// for ( i = 0; i < AxisSquadsFF.Length; i++ )
+		// {
+			// AxisSquads.InsertItem(i, AxisSquadsFF[i]);
+			// AlliesSquads.InsertItem(i, AlliesSquadsFF[i]);
+		// }
+	// }
+// }
+
+function bool HasAnyInfantrySquad()
+{
+	local int i;
+	for ( i = 0; i < AxisSquads.Length; i++ )
+	{
+		if ( AxisSquads[i].SquadType == ROST_Infantry )
+		{
+			return true;
+		}
+
+		if ( AlliesSquads[i].SquadType == ROST_Infantry )
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+function bool WaitingForVehicleToSpawn(float TimeSeconds, byte TeamIndex, bool bReversedRoles, byte SquadIndex, byte FireTeamIndex, byte RoleIndex, bool bForcingRespawn)
+{
+	if ( (!bReversedRoles && TeamIndex == `AXIS_TEAM_INDEX) || (bReversedRoles && TeamIndex != `AXIS_TEAM_INDEX) )
+	{
+		return !AxisSquads[SquadIndex].VehicleReadyToRespawn(TimeSeconds, bReversedRoles, FireTeamIndex, RoleIndex, bForcingRespawn);
+	}
+	else
+	{
+		return !AlliesSquads[SquadIndex].VehicleReadyToRespawn(TimeSeconds, bReversedRoles, FireTeamIndex, RoleIndex, bForcingRespawn);
+	}
+}
+
+function int GetFireTeamVehicleRespawnTime(float TimeSeconds, byte TeamIndex, bool bReversedRoles, byte SquadIndex, byte FireTeamIndex)
+{
+	local ROVehicle VehicleRef;
+
+	VehicleRef = GetFireTeamVehicle(TeamIndex, bReversedRoles, SquadIndex, FireTeamIndex);
+
+	if ( VehicleRef != none && VehicleRef.Health > 0 )
+	{
+		return -1;
+	}
+
+	if ( (!bReversedRoles && TeamIndex == `AXIS_TEAM_INDEX) || (bReversedRoles && TeamIndex != `AXIS_TEAM_INDEX) )
+	{
+		return AxisSquads[SquadIndex].VehicleTimeUntilRespawn(TimeSeconds, FireTeamIndex);
+	}
+	else
+	{
+		return AlliesSquads[SquadIndex].VehicleTimeUntilRespawn(TimeSeconds, FireTeamIndex);
+	}
+}
+
+function SetNextRespawnTimeForVehicleFireTeam(int NextRespawnTime, byte TeamIndex, bool bReversedRoles, byte SquadIndex, byte FireTeamIndex)
+{
+	local int i;
+
+	if ( (!bReversedRoles && TeamIndex == `AXIS_TEAM_INDEX) || (bReversedRoles && TeamIndex != `AXIS_TEAM_INDEX) )
+	{
+		for ( i = 0; i < AxisSquads[SquadIndex].FireTeams[FireTeamIndex].Roles.Length; i++ )
+		{
+			if ( ROPlayerController(AxisSquads[SquadIndex].FireTeams[FireTeamIndex].Roles[i].Owner) != none )
+			{
+				ROPlayerController(AxisSquads[SquadIndex].FireTeams[FireTeamIndex].Roles[i].Owner).NextRespawnTime = NextRespawnTime;
+			}
+		}
+	}
+	else
+	{
+		for ( i = 0; i < AlliesSquads[SquadIndex].FireTeams[FireTeamIndex].Roles.Length; i++ )
+		{
+			if ( ROPlayerController(AlliesSquads[SquadIndex].FireTeams[FireTeamIndex].Roles[i].Owner) != none )
+			{
+				ROPlayerController(AlliesSquads[SquadIndex].FireTeams[FireTeamIndex].Roles[i].Owner).NextRespawnTime = NextRespawnTime;
+			}
+		}
+	}
+}
+
+function ROVehicle SpawnFireTeamTank(byte TeamIndex, bool bReversedRoles, byte SquadIndex, byte FireTeamIndex, Actor Owner, vector SpawnLocation, rotator SpawnRotation)
+{
+	if ( (!bReversedRoles && TeamIndex == `AXIS_TEAM_INDEX) || (bReversedRoles && TeamIndex != `AXIS_TEAM_INDEX) )
+	{
+		return AxisSquads[SquadIndex].SpawnFireTeamTank(bReversedRoles, FireTeamIndex, Owner, SpawnLocation, SpawnRotation);
+	}
+	else
+	{
+		return AlliesSquads[SquadIndex].SpawnFireTeamTank(bReversedRoles, FireTeamIndex, Owner, SpawnLocation, SpawnRotation);
+	}
+}
+
+function ROVehicle SpawnSquadTransport(byte TeamIndex, bool bReversedRoles, byte SquadIndex, Actor Owner, vector SpawnLocation, rotator SpawnRotation)
+{
+	if ( (!bReversedRoles && TeamIndex == `AXIS_TEAM_INDEX) || (bReversedRoles && TeamIndex != `AXIS_TEAM_INDEX) )
+	{
+		return AxisSquads[SquadIndex].SpawnSquadTransport(Owner, bReversedRoles, SpawnLocation, SpawnRotation);
+	}
+	else
+	{
+		return AlliesSquads[SquadIndex].SpawnSquadTransport(Owner, bReversedRoles, SpawnLocation, SpawnRotation);
+	}
+}
+
+function ROVehicle GetFireTeamVehicle(byte TeamIndex, bool bReversedRoles, byte SquadIndex, byte FireTeamIndex)
+{
+	if ( bReversedRoles )
+	{
+		if ( TeamIndex == `ALLIES_TEAM_INDEX )
+		{
+			if ( AxisSquads[SquadIndex].FireTeams[FireTeamIndex].OpposingTeamVehicleClass != none )
+			{
+				return AxisSquads[SquadIndex].FireTeams[FireTeamIndex].Vehicle;
+			}
+			else if ( AxisSquads[SquadIndex].FireTeams[0].OpposingTeamVehicleClass != none && !AxisSquads[SquadIndex].FireTeams[0].OpposingTeamVehicleClass.static.IsTank() )
+			{
+				return AxisSquads[SquadIndex].FireTeams[0].Vehicle;
+			}
+		}
+		else
+		{
+			if ( AlliesSquads[SquadIndex].FireTeams[FireTeamIndex].OpposingTeamVehicleClass != none )
+			{
+				return AlliesSquads[SquadIndex].FireTeams[FireTeamIndex].Vehicle;
+			}
+			else if ( AlliesSquads[SquadIndex].FireTeams[0].OpposingTeamVehicleClass != none && !AlliesSquads[SquadIndex].FireTeams[0].OpposingTeamVehicleClass.static.IsTank() )
+			{
+				return AlliesSquads[SquadIndex].FireTeams[0].Vehicle;
+			}
+		}
+	}
+	else
+	{
+		if ( TeamIndex == `AXIS_TEAM_INDEX )
+		{
+			if ( AxisSquads[SquadIndex].FireTeams[FireTeamIndex].VehicleClass != none )
+			{
+				return AxisSquads[SquadIndex].FireTeams[FireTeamIndex].Vehicle;
+			}
+			else if ( AxisSquads[SquadIndex].FireTeams[0].VehicleClass != none && !AxisSquads[SquadIndex].FireTeams[0].VehicleClass.static.IsTank() )
+			{
+				return AxisSquads[SquadIndex].FireTeams[0].Vehicle;
+			}
+		}
+		else
+		{
+			if ( AlliesSquads[SquadIndex].FireTeams[FireTeamIndex].VehicleClass != none )
+			{
+				return AlliesSquads[SquadIndex].FireTeams[FireTeamIndex].Vehicle;
+			}
+			else if ( AlliesSquads[SquadIndex].FireTeams[0].VehicleClass != none && !AlliesSquads[SquadIndex].FireTeams[0].VehicleClass.static.IsTank() )
+			{
+				return AlliesSquads[SquadIndex].FireTeams[0].Vehicle;
+			}
+		}
+	}
+
+	return none;
+}
+
+function GetTransportInfo(byte TeamIndex, bool bReversedRoles, ROPlayerReplicationInfo ROPRI, out byte TransportCrew, out byte TransportSquadLeader, out ROVehicle TransportVehicle)
+{
+	local DRSquadInfo Squad;
+
+	if ( (!bReversedRoles && TeamIndex == `AXIS_TEAM_INDEX) || (bReversedRoles && TeamIndex != `AXIS_TEAM_INDEX) )
+	{
+		if ( ROPRI.SquadIndex < AxisSquads.Length )
+		{
+			Squad = AxisSquads[ROPRI.SquadIndex];
+		}
+	}
+	else
+	{
+		if ( ROPRI.SquadIndex < AlliesSquads.Length )
+		{
+			Squad = AlliesSquads[ROPRI.SquadIndex];
+		}
+	}
+
+	if ( Squad.FireTeams.Length <= 0 || Squad == none || Squad.FireTeams[0].VehicleClass == none || Squad.FireTeams[0].VehicleClass.static.IsTank() )
+	{
+		TransportCrew = 0;
+		TransportSquadLeader = 0;
+		TransportVehicle = none;
+	}
+	else
+	{
+		TransportCrew = 1;
+		TransportSquadLeader = (ROPRI.RoleIndex == 0 ? 1 : 0);
+		TransportVehicle = Squad.FireTeams[0].Vehicle;
+	}
+}
+
+function Controller GetTankCommander(byte TeamIndex, bool bReversedRoles, byte SquadIndex, byte FireTeamIndex)
+{
+	local int i;
+
+	if ( bReversedRoles )
+	{
+		if ( TeamIndex == `ALLIES_TEAM_INDEX )
+		{
+			for ( i = 0; i < AxisSquads[SquadIndex].FireTeams[FireTeamIndex].Roles.Length; i++ )
+			{
+				if ( AxisSquads[SquadIndex].FireTeams[FireTeamIndex].Roles[i].RoleInfo.OpposingTeamEquivalent.bIsTankCommander )
+				{
+					return AxisSquads[SquadIndex].FireTeams[FireTeamIndex].Roles[i].Owner;
+				}
+			}
+		}
+		else
+		{
+			for ( i = 0; i < AlliesSquads[SquadIndex].FireTeams[FireTeamIndex].Roles.Length; i++ )
+			{
+				if ( AlliesSquads[SquadIndex].FireTeams[FireTeamIndex].Roles[i].RoleInfo.OpposingTeamEquivalent.bIsTankCommander )
+				{
+					return AlliesSquads[SquadIndex].FireTeams[FireTeamIndex].Roles[i].Owner;
+				}
+			}
+		}
+	}
+	else
+	{
+		if ( TeamIndex == `AXIS_TEAM_INDEX )
+		{
+			for ( i = 0; i < AxisSquads[SquadIndex].FireTeams[FireTeamIndex].Roles.Length; i++ )
+			{
+				if ( AxisSquads[SquadIndex].FireTeams[FireTeamIndex].Roles[i].RoleInfo.bIsTankCommander )
+				{
+					return AxisSquads[SquadIndex].FireTeams[FireTeamIndex].Roles[i].Owner;
+				}
+			}
+		}
+		else
+		{
+			for ( i = 0; i < AlliesSquads[SquadIndex].FireTeams[FireTeamIndex].Roles.Length; i++ )
+			{
+				if ( AlliesSquads[SquadIndex].FireTeams[FireTeamIndex].Roles[i].RoleInfo.bIsTankCommander )
+				{
+					return AlliesSquads[SquadIndex].FireTeams[FireTeamIndex].Roles[i].Owner;
+				}
+			}
+		}
+	}
+}
+
+function Controller GetTankDriver(byte TeamIndex, bool bReversedRoles, byte SquadIndex, byte FireTeamIndex)
+{
+	local int i;
+
+	if ( bReversedRoles )
+	{
+		if ( TeamIndex == `ALLIES_TEAM_INDEX )
+		{
+			for ( i = 0; i < AxisSquads[SquadIndex].FireTeams[FireTeamIndex].Roles.Length; i++ )
+			{
+				if ( AxisSquads[SquadIndex].FireTeams[FireTeamIndex].Roles[i].RoleInfo.OpposingTeamEquivalent.bIsVehicleDriver )
+				{
+					return AxisSquads[SquadIndex].FireTeams[FireTeamIndex].Roles[i].Owner;
+				}
+			}
+		}
+		else
+		{
+			for ( i = 0; i < AlliesSquads[SquadIndex].FireTeams[FireTeamIndex].Roles.Length; i++ )
+			{
+				if ( AlliesSquads[SquadIndex].FireTeams[FireTeamIndex].Roles[i].RoleInfo.OpposingTeamEquivalent.bIsVehicleDriver )
+				{
+					return AlliesSquads[SquadIndex].FireTeams[FireTeamIndex].Roles[i].Owner;
+				}
+			}
+		}
+	}
+	else
+	{
+		if ( TeamIndex == `AXIS_TEAM_INDEX )
+		{
+			for ( i = 0; i < AxisSquads[SquadIndex].FireTeams[FireTeamIndex].Roles.Length; i++ )
+			{
+				if ( AxisSquads[SquadIndex].FireTeams[FireTeamIndex].Roles[i].RoleInfo.bIsVehicleDriver )
+				{
+					return AxisSquads[SquadIndex].FireTeams[FireTeamIndex].Roles[i].Owner;
+				}
+			}
+		}
+		else
+		{
+			for ( i = 0; i < AlliesSquads[SquadIndex].FireTeams[FireTeamIndex].Roles.Length; i++ )
+			{
+				if ( AlliesSquads[SquadIndex].FireTeams[FireTeamIndex].Roles[i].RoleInfo.bIsVehicleDriver )
+				{
+					return AlliesSquads[SquadIndex].FireTeams[FireTeamIndex].Roles[i].Owner;
+				}
+			}
+		}
+	}
+}
+
+function Controller GetTankMGer(byte TeamIndex, bool bReversedRoles, byte SquadIndex, byte FireTeamIndex)
+{
+	local int i;
+
+	if ( bReversedRoles )
+	{
+		if ( TeamIndex == `ALLIES_TEAM_INDEX )
+		{
+			for ( i = 0; i < AxisSquads[SquadIndex].FireTeams[FireTeamIndex].Roles.Length; i++ )
+			{
+				if ( AxisSquads[SquadIndex].FireTeams[FireTeamIndex].Roles[i].RoleInfo.OpposingTeamEquivalent.bIsVehicleMGer )
+				{
+					return AxisSquads[SquadIndex].FireTeams[FireTeamIndex].Roles[i].Owner;
+				}
+			}
+		}
+		else
+		{
+			for ( i = 0; i < AlliesSquads[SquadIndex].FireTeams[FireTeamIndex].Roles.Length; i++ )
+			{
+				if ( AlliesSquads[SquadIndex].FireTeams[FireTeamIndex].Roles[i].RoleInfo.OpposingTeamEquivalent.bIsVehicleMGer )
+				{
+					return AlliesSquads[SquadIndex].FireTeams[FireTeamIndex].Roles[i].Owner;
+				}
+			}
+		}
+	}
+	else
+	{
+		if ( TeamIndex == `AXIS_TEAM_INDEX )
+		{
+			for ( i = 0; i < AxisSquads[SquadIndex].FireTeams[FireTeamIndex].Roles.Length; i++ )
+			{
+				if ( AxisSquads[SquadIndex].FireTeams[FireTeamIndex].Roles[i].RoleInfo.bIsVehicleMGer )
+				{
+					return AxisSquads[SquadIndex].FireTeams[FireTeamIndex].Roles[i].Owner;
+				}
+			}
+		}
+		else
+		{
+			for ( i = 0; i < AlliesSquads[SquadIndex].FireTeams[FireTeamIndex].Roles.Length; i++ )
+			{
+				if ( AlliesSquads[SquadIndex].FireTeams[FireTeamIndex].Roles[i].RoleInfo.bIsVehicleMGer )
+				{
+					return AlliesSquads[SquadIndex].FireTeams[FireTeamIndex].Roles[i].Owner;
+				}
+			}
+		}
+	}
+
+	// Need to set this here, as otherwise vehicles without a Hull MG will cause servers to crash when trying to spawn the vehicle in question
+	return none;
+}
+
+function Controller GetTransportDriver(byte TeamIndex, bool bReversedRoles, byte SquadIndex)
+{
+	if ( (!bReversedRoles && TeamIndex == `AXIS_TEAM_INDEX) || (bReversedRoles && TeamIndex != `AXIS_TEAM_INDEX) )
+	{
+		return AxisSquads[SquadIndex].FireTeams[0].Roles[0].Owner;
+	}
+	else
+	{
+		return AlliesSquads[SquadIndex].FireTeams[0].Roles[0].Owner;
+	}
+}
+
+function Controller GetTransportMGer(byte TeamIndex, bool bReversedRoles, byte SquadIndex)
+{
+	if ( (!bReversedRoles && TeamIndex == `AXIS_TEAM_INDEX) || (bReversedRoles && TeamIndex != `AXIS_TEAM_INDEX) )
+	{
+		return AxisSquads[SquadIndex].FireTeams[1].Roles[0].Owner;
+	}
+	else
+	{
+		return AlliesSquads[SquadIndex].FireTeams[1].Roles[0].Owner;
+	}
+}
+
+function DestroyAllVehicles()
+{
+	local int i, j;
+
+	for ( i = 0; i < AxisSquads.Length; i++ )
+	{
+		for ( j = 0; j < AxisSquads[i].FireTeams.Length; j++ )
+		{
+			if ( AxisSquads[i].FireTeams[j].Vehicle != none )
+			{
+				AxisSquads[i].FireTeams[j].Vehicle.Health = 0;
+				AxisSquads[i].FireTeams[j].Vehicle.Destroy();
+				AxisSquads[i].FireTeams[j].Vehicle = none;
+			}
+		}
+	}
+
+	for ( i = 0; i < AlliesSquads.Length; i++ )
+	{
+		for ( j = 0; j < AlliesSquads[i].FireTeams.Length; j++ )
+		{
+			if ( AlliesSquads[i].FireTeams[j].Vehicle != none )
+			{
+				AlliesSquads[i].FireTeams[j].Vehicle.Health = 0;
+				AlliesSquads[i].FireTeams[j].Vehicle.Destroy();
+				AlliesSquads[i].FireTeams[j].Vehicle = none;
+			}
+		}
+	}
+}
+
+function DRRI GetRoleInfo(byte TeamIndex, bool bReversedRoles, byte SquadIndex, byte FireTeamIndex, byte RoleIndex)
+{
+	if ( (!bReversedRoles && TeamIndex == `AXIS_TEAM_INDEX) || (bReversedRoles && TeamIndex != `AXIS_TEAM_INDEX) )
+	{
+		if ( SquadIndex == `SQUAD_INDEX_TEAMLEADER )
+		{
+			if ( bReversedRoles )
+			{
+				return AxisTeamLeader.RoleInfo.OpposingTeamEquivalent;
+			}
+
+			return AxisTeamLeader.RoleInfo;
+		}
+		else
+		{
+			return AxisSquads[SquadIndex].GetRole(bReversedRoles, FireTeamIndex, RoleIndex);
+		}
+	}
+	else
+	{
+		if ( SquadIndex == `SQUAD_INDEX_TEAMLEADER )
+		{
+			if ( bReversedRoles )
+			{
+				return AlliesTeamLeader.RoleInfo.OpposingTeamEquivalent;
+			}
+
+			return AlliesTeamLeader.RoleInfo;
+		}
+		else
+		{
+			return AlliesSquads[SquadIndex].GetRole(bReversedRoles, FireTeamIndex, RoleIndex);
+		}
+	}
+}
+
+function bool OwnerHasRole(Controller Owner, byte TeamIndex, byte SquadIndex, byte FireTeamIndex, byte RoleIndex, WorldInfo WorldInfo)
+{
+	`LogRoles("OwnerHasRole" @ Owner.PlayerReplicationInfo.PlayerName @ Owner @ TeamIndex @ SquadIndex @ FireTeamIndex @ RoleIndex);
+
+	if ( Owner == none || ROPlayerReplicationInfo(Owner.PlayerReplicationInfo) == none )
+	{
+		`LogRoles("OwnerHasRole - Owner == none || ROPlayerReplicationInfo(Owner.PlayerReplicationInfo) == none");
+		return false;
+	}
+	else if ( TeamIndex != 200 && Owner.GetTeamNum() != TeamIndex )
+	{
+		`LogRoles("OwnerHasRole - TeamIndex != 200 && Owner.GetTeamNum() != TeamIndex");
+		return false;
+	}
+	else if ( ROPlayerReplicationInfo(Owner.PlayerReplicationInfo).SquadIndex != SquadIndex )
+	{
+		`LogRoles("OwnerHasRole - ROPlayerReplicationInfo(Owner.PlayerReplicationInfo).SquadIndex != SquadIndex" @ ROPlayerReplicationInfo(Owner.PlayerReplicationInfo).SquadIndex);
+		return false;
+	}
+	else if ( SquadIndex == `SQUAD_INDEX_TEAMLEADER )
+	{
+		`LogRoles("OwnerHasRole - SquadIndex == `SQUAD_INDEX_TEAMLEADER");
+		return true;
+	}
+	else if ( ROPlayerReplicationInfo(Owner.PlayerReplicationInfo).FireTeamIndex != FireTeamIndex )
+	{
+		`LogRoles("OwnerHasRole - ROPlayerReplicationInfo(Owner.PlayerReplicationInfo).FireTeamIndex != FireTeamIndex");
+		return false;
+	}
+	else if ( FireTeamIndex == `FIRETEAM_INDEX_SQUADLEADER )
+	{
+		`LogRoles("OwnerHasRole - FireTeamIndex == `FIRETEAM_INDEX_SQUADLEADER");
+		return true;
+	}
+
+	`LogRoles("OwnerHasRole - EoF returning" @ ROPlayerReplicationInfo(Owner.PlayerReplicationInfo).RoleIndex == RoleIndex @ ROPlayerReplicationInfo(Owner.PlayerReplicationInfo).RoleIndex);
+	return ROPlayerReplicationInfo(Owner.PlayerReplicationInfo).RoleIndex == RoleIndex;
+}
+
+function int GetTimeLimit(int MaxPlayers)
+{
+	if ( MaxPlayers <= 16 )
+	{
+		return TimeLimit16;
+	}
+	else if ( MaxPlayers <= 32 )
+	{
+		return TimeLimit32;
+	}
+	else
+	{
+		return TimeLimit64;
+	}
+}
+
+function EDefendingTeam GetDefendingTeam(int MaxPlayers)
+{
+	return DefendingTeam;
+}
+
+function int GetAxisReinforcementDelay(int MaxPlayers, class<GameInfo> GameTypeClass, bool bReversedTeams, optional float TimeScale = 1.0, optional bool bVehicleReinforcement)
+{
+	if(bReversedTeams)
+		return GetAlliesReinforcementDelay(MaxPlayers,GameTypeClass, False, TimeScale, bVehicleReinforcement);
+
+	/*if ( GameTypeClass.static.GetGameType() == ROGT_Firefight )
+	{
+		if ( MaxPlayers <= 16 )
+			return TimeScale * float(AxisFFReinforcementDelay16);
+		else if ( MaxPlayers <= 32 )
+			return TimeScale * float(AxisFFReinforcementDelay32);
+		else
+			return TimeScale * float(AxisFFReinforcementDelay64);
+	}
+	else */if ( bVehicleReinforcement )
+	{
+		if ( MaxPlayers <= 16 )
+			return TimeScale * AxisVHReinforcementDelay16;
+		else if ( MaxPlayers <= 32 )
+			return TimeScale * AxisVHReinforcementDelay32;
+		else
+			return TimeScale * AxisVHReinforcementDelay64;
+	}
+	else
+	{
+		if ( MaxPlayers <= 16 )
+			return TimeScale * float(AxisReinforcementDelay16);
+		else if ( MaxPlayers <= 32 )
+			return TimeScale * float(AxisReinforcementDelay32);
+		else
+			return TimeScale * float(AxisReinforcementDelay64);
+	}
+}
+
+function int GetAlliesReinforcementDelay(int MaxPlayers, class<GameInfo> GameTypeClass, bool bReversedTeams, optional float TimeScale = 1.0, optional bool bVehicleReinforcement)
+{
+	if(bReversedTeams)
+		return GetAxisReinforcementDelay(MaxPlayers,GameTypeClass, False, TimeScale, bVehicleReinforcement);
+
+	/*if ( GameTypeClass.static.GetGameType() == ROGT_Firefight )
+	{
+		if ( MaxPlayers <= 16 )
+			return TimeScale * float(AlliesFFReinforcementDelay16);
+		else if ( MaxPlayers <= 32 )
+			return TimeScale * float(AlliesFFReinforcementDelay32);
+		else
+			return TimeScale * float(AlliesFFReinforcementDelay64);
+	}
+	else*/ if ( bVehicleReinforcement )
+	{
+		if ( MaxPlayers <= 16 )
+			return TimeScale * (AlliesVHReinforcementDelay16);
+		else if ( MaxPlayers <= 32 )
+			return TimeScale * (AlliesVHReinforcementDelay32);
+		else
+			return TimeScale * (AlliesVHReinforcementDelay64);
+	}
+	else
+	{
+		if ( MaxPlayers <= 16 )
+			return TimeScale * float(AlliesReinforcementDelay16);
+		else if ( MaxPlayers <= 32 )
+			return TimeScale * float(AlliesReinforcementDelay32);
+		else
+			return TimeScale * float(AlliesReinforcementDelay64);
+	}
+}
+
+function int GetAxisStartingReinforcements(int MaxPlayers, bool bReversedTeams)
+{
+	if ( bReversedTeams )
+	{
+		return GetAlliesStartingReinforcements(MaxPlayers, false);
+	}
+
+	if ( MaxPlayers <= 16 )
+	{
+		return int(float(AxisReinforcementCount16) * (float(MaxPlayers) / 16.0));
+	}
+	else if ( MaxPlayers <= 32 )
+	{
+		return AxisReinforcementCount16 + (float(AxisReinforcementCount32 - AxisReinforcementCount16) * (float(MaxPlayers - 16) / 16.0));
+	}
+	else
+	{
+		return AxisReinforcementCount32 + (float(AxisReinforcementCount64 - AxisReinforcementCount32) * (float(MaxPlayers - 32) / 32.0));
+	}
+}
+
+function int GetAlliesStartingReinforcements(int MaxPlayers, bool bReversedTeams)
+{
+	if ( bReversedTeams )
+	{
+		return GetAxisStartingReinforcements(MaxPlayers, false);
+	}
+
+	if ( MaxPlayers <= 16 )
+	{
+		return int(float(AlliesReinforcementCount16) * (float(MaxPlayers) / 16.0));
+	}
+	else if ( MaxPlayers <= 32 )
+	{
+		return AlliesReinforcementCount16 + (float(AlliesReinforcementCount32 - AlliesReinforcementCount16) * (float(MaxPlayers - 16) / 16.0));
+	}
+	else
+	{
+		return AlliesReinforcementCount32 + (float(AlliesReinforcementCount64 - AlliesReinforcementCount32) * (float(MaxPlayers - 32) / 32.0));
+	}
+}
+
+function int GetMaxArtyType(int Team, bool bReversedRoles)
+{
+	if ( (!bReversedRoles && Team == `AXIS_TEAM_INDEX) || (bReversedRoles && Team != `AXIS_TEAM_INDEX) )
+   	{
+   		return AxisMaxAvailableArtilleryType;
+   	}
+   	else
+   	{
+		return AlliesMaxAvailableArtilleryType;
+	}
+}
+
+function int GetBatterySize(int Team, EROArtilleryType ArtyType)
+{
+   	local int BatterySize;
+
+	switch(ArtyType)
+	{
+		case ArtyType_Mortar:
+			BatterySize = MortarStats.BatterySize;
+			break;
+		case ArtyType_MediumArty:
+			BatterySize = MediumArtyStats.BatterySize;
+			break;
+		case ArtyType_RocketArty:
+			BatterySize = RocketArtyStats.BatterySize;
+			break;
+		default:
+			BatterySize = Rand(3) + 4;
+	}
+
+	return BatterySize;
+}
+
+function int GetSalvoAmount(int Team, EROArtilleryType ArtyType)
+{
+   	local int SalvoAmount;
+
+	switch(ArtyType)
+	{
+		case ArtyType_Mortar:
+			SalvoAmount = MortarStats.SalvoAmount;
+			break;
+		case ArtyType_MediumArty:
+			SalvoAmount = MediumArtyStats.SalvoAmount;
+			break;
+		case ArtyType_RocketArty:
+			SalvoAmount = RocketArtyStats.SalvoAmount;
+			break;
+		default:
+			SalvoAmount = Rand(3) + 4;
+	}
+
+	return SalvoAmount;
+}
+
+function int GetSpreadAmount(int Team, EROArtilleryType ArtyType)
+{
+   	local int SpreadAmount;
+
+   	switch(ArtyType)
+	{
+		case ArtyType_Mortar:
+			SpreadAmount = MortarStats.StrikePattern;
+			break;
+		case ArtyType_MediumArty:
+			SpreadAmount = MediumArtyStats.StrikePattern;
+			break;
+		case ArtyType_RocketArty:
+			SpreadAmount = RocketArtyStats.StrikePattern;
+			break;
+		default:
+			SpreadAmount = 1000;
+	}
+
+	return SpreadAmount;
+}
+
+function int GetStrikeInterval(int Team, bool bReversedRoles)
+{
+   	local int StrikeInterval;
+   	local EROArtyStrikeInterval ArtyStrikeInterval;
+
+	if ( (!bReversedRoles && Team == `AXIS_TEAM_INDEX) || (bReversedRoles && Team != `AXIS_TEAM_INDEX) )
+	{
+		ArtyStrikeInterval = AxisArtilleryStrikeInterval;
+	}
+	else
+	{
+		ArtyStrikeInterval = AlliesArtilleryStrikeInterval;
+	}
+
+   	switch(ArtyStrikeInterval)
+	{
+		case STINT_Short_30s:
+			StrikeInterval = 30;
+			break;
+		case STINT_Med_45s:
+			StrikeInterval = 45;
+			break;
+		case STINT_Long_1m:
+			StrikeInterval = 60;
+			break;
+		case STINT_VLong_3m:
+			StrikeInterval = 150;
+			break;
+		default:
+			StrikeInterval = 30;
+	}
+
+	return StrikeInterval;
+}
+
+function int GetSalvoInterval(int Team, EROArtilleryType ArtyType)
+{
+   	local int SalvoInterval;
+
+   	switch(ArtyType)
+	{
+		case ArtyType_Mortar:
+			SalvoInterval = MortarStats.SalvoInterval;
+			break;
+		case ArtyType_MediumArty:
+			SalvoInterval = MediumArtyStats.SalvoInterval;
+			break;
+		case ArtyType_RocketArty:
+			SalvoInterval = RocketArtyStats.SalvoInterval;
+			break;
+		default:
+			SalvoInterval = 5;
+	}
+
+	return SalvoInterval;
+}
+
+function int GetStrikeDelay(int Team, EROArtilleryType ArtyType)
+{
+   	local int StrikeDelay;
+
+   	switch(ArtyType)
+	{
+		case ArtyType_Mortar:
+			StrikeDelay = MortarStats.StrikeDelay;
+			break;
+		case ArtyType_MediumArty:
+			StrikeDelay = MediumArtyStats.StrikeDelay;
+			break;
+		case ArtyType_RocketArty:
+			StrikeDelay = RocketArtyStats.StrikeDelay;
+			break;
+		default:
+			StrikeDelay = 15;
+	}
+
+	return StrikeDelay;
+}
+
+function int GetMortarStrikeLimit(int MaxPlayers, int TeamIndex)
+{
+	if ( TeamIndex < `ALLIES_TEAM_INDEX )
+	{
+		if ( MaxPlayers <= 16 )
+		{
+			return AxisMortarStrikeLimit16;
+		}
+		else if ( MaxPlayers <= 32 )
+		{
+			return AxisMortarStrikeLimit32;
+		}
+		else
+		{
+			return AxisMortarStrikeLimit64;
+		}
+	}
+	else
+	{
+		if ( MaxPlayers <= 16 )
+		{
+			return AlliesMortarStrikeLimit16;
+		}
+		else if ( MaxPlayers <= 32 )
+		{
+			return AlliesMortarStrikeLimit32;
+		}
+		else
+		{
+			return AlliesMortarStrikeLimit64;
+		}
+	}
+}
+
+function int GetArtilleryStrikeLimit(int MaxPlayers, int TeamIndex)
+{
+ 	if ( TeamIndex < `ALLIES_TEAM_INDEX )
+	{
+		if ( MaxPlayers <= 16 )
+		{
+			return AxisArtilleryStrikeLimit16;
+		}
+		else if ( MaxPlayers <= 32 )
+		{
+			return AxisArtilleryStrikeLimit32;
+		}
+		else
+		{
+			return AxisArtilleryStrikeLimit64;
+		}
+	}
+	else
+	{
+		if ( MaxPlayers <= 16 )
+		{
+			return AlliesArtilleryStrikeLimit16;
+		}
+		else if ( MaxPlayers <= 32 )
+		{
+			return AlliesArtilleryStrikeLimit32;
+		}
+		else
+		{
+			return AlliesArtilleryStrikeLimit64;
+		}
+	}
+}
+
+function int GetRocketStrikeLimit(int MaxPlayers, int TeamIndex)
+{
+	if ( TeamIndex < `ALLIES_TEAM_INDEX )
+	{
+		if ( MaxPlayers <= 16 )
+		{
+			return AxisRocketStrikeLimit16;
+		}
+		else if ( MaxPlayers <= 32 )
+		{
+			return AxisRocketStrikeLimit32;
+		}
+		else
+		{
+			return AxisRocketStrikeLimit64;
+		}
+	}
+	else
+	{
+		if ( MaxPlayers <= 16 )
+		{
+			return AlliesRocketStrikeLimit16;
+		}
+		else if ( MaxPlayers <= 32 )
+		{
+			return AlliesRocketStrikeLimit32;
+		}
+		else
+		{
+			return AlliesRocketStrikeLimit64;
+		}
+	}
+}
+
+defaultproperties
+{
+	NorthOffset=0
+	
+	MaxSpawnOnSquadLeaderDistance=1200.0
+	
+	AxisReinforcementCount16=100
+	AxisReinforcementCount32=200
+	AxisReinforcementCount64=400
+	AlliesReinforcementCount16=100
+	AlliesReinforcementCount32=200
+	AlliesReinforcementCount64=400
+
+	AlliesReinforcementDelay16=20
+	AlliesReinforcementDelay32=20
+	AlliesReinforcementDelay64=20
+	AxisReinforcementDelay16=20
+	AxisReinforcementDelay32=20
+	AxisReinforcementDelay64=20
+	
+	AlliesVHReinforcementDelay16=30
+	AlliesVHReinforcementDelay32=30
+	AlliesVHReinforcementDelay64=30
+	AxisVHReinforcementDelay16=30
+	AxisVHReinforcementDelay32=30
+	AxisVHReinforcementDelay64=30
+	
+	// AlliesFFReinforcementDelay16=15
+	// AlliesFFReinforcementDelay32=15
+	// AlliesFFReinforcementDelay64=15
+	// AxisFFReinforcementDelay16=15
+	// AxisFFReinforcementDelay32=15
+	// AxisFFReinforcementDelay64=15
+	
+	TimeLimit16=600
+	TimeLimit32=900
+	TimeLimit64=2400
+	
+	DefendingTeam=DT_None
+	
+	TankBehaviorTree = CCSBTTree'GripTankAI.CoreTrees.Tank';
+	
+	MinimumTimeDead=7
+	InstantRespawnInterval=120
+	
+	MortarStats=(BatterySize=5,SalvoAmount=5,StrikeDelay=5,SalvoInterval=2.5,StrikePattern=850,ShellClass=class'ROMortarShell')
+	MediumArtyStats=(BatterySize=3,SalvoAmount=5,StrikeDelay=8,SalvoInterval=10.0,StrikePattern=1250,ShellClass=class'ROArtilleryShell')
+	RocketArtyStats=(BatterySize=15,SalvoAmount=0,StrikeDelay=12,SalvoInterval=0.5,StrikePattern=2500,ShellClass=class'RORocketShell')
+	
+	AxisMortarStrikeLimit16=1
+	AxisMortarStrikeLimit32=2
+	AxisMortarStrikeLimit64=3
+	AlliesMortarStrikeLimit16=1
+	AlliesMortarStrikeLimit32=2
+	AlliesMortarStrikeLimit64=3
+	AxisArtilleryStrikeLimit16=1
+	AxisArtilleryStrikeLimit32=2
+	AxisArtilleryStrikeLimit64=3
+	AlliesArtilleryStrikeLimit16=1
+	AlliesArtilleryStrikeLimit32=2
+	AlliesArtilleryStrikeLimit64=3
+	AxisRocketStrikeLimit16=1
+	AxisRocketStrikeLimit32=2
+	AxisRocketStrikeLimit64=3
+	AlliesRocketStrikeLimit16=1
+	AlliesRocketStrikeLimit32=2
+	AlliesRocketStrikeLimit64=3
+	
+	TempCelsius=50
+	
+	AxisDefaultRoleClass=class'DRRI_DAK_01_Rifleman'
+	AlliesDefaultRoleClass=class'DRRI_UK_01_Rifleman'
+	
+	DestructableMaxViewRange=10000
+}

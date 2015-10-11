@@ -1,0 +1,2 @@
+
+class DRVoicePack extends ROVoicePack;

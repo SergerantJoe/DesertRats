@@ -1,0 +1,117 @@
+
+///////////////////////////////////////////////////////////////////////////////////// DRPlayerController ///////////////////////////////////////////////////////////////////////////////
+
+`define UK_1		class'DRVoicePackBrit01'
+`define UK_2		class'DRVoicePackBrit02'
+`define UK_3		class'DRVoicePackBrit03'
+`define DAK_1		class'DRVoicePackGer01'
+`define DAK_2		class'DRVoicePackGer02'
+`define DAK_3		class'DRVoicePackGer03'
+
+`define ReconInRoute_UK		SoundCue'AUD_RS_VOX_Chatter_Eng_04.Radio.CMD_INF_RadioReconOnWay_NOR_Cue'
+`define ReconDenied_UK		SoundCue'AUD_RS_VOX_Chatter_Eng_04.Radio.CMD_INF_RadioReconDeny_NOR_Cue'
+`define MortarsConfirm_UK	SoundCue'AUD_RS_VOX_Chatter_Eng_04.Radio.CMD_INF_RadioMortarsOnWay_NOR_Cue'
+`define ArtilleryConfirm_UK	SoundCue'AUD_RS_VOX_Chatter_Eng_04.Radio.CMD_INF_RadioArtilleryOnWay_NOR_Cue'
+`define RocketsConfirm_UK	SoundCue'AUD_RS_VOX_Chatter_Eng_04.Radio.CMD_INF_RadioRocketsOnWay_NOR_Cue'
+`define DenyArtillery_UK		SoundCue'AUD_RS_VOX_Chatter_Eng_04.Radio.CMD_INF_RadioDenySupport_NOR_Cue'
+`define NoArtillery_UK		SoundCue'AUD_RS_VOX_Chatter_Eng_04.Radio.CMD_INF_RadioNoArtyLeft_NOR_Cue'
+`define ReconInRoute_DAK	SoundCue'AUD_VOX_Chatter_GerGer_04.Radio.CMD_INF_RadioReconOnWay_NOR_Cue'
+`define ReconDenied_DAK		SoundCue'AUD_VOX_Chatter_GerGer_04.Radio.CMD_INF_RadioReconDeny_NOR_Cue'
+`define MortarsConfirm_DAK	SoundCue'AUD_VOX_Chatter_GerGer_04.Radio.CMD_INF_RadioMortarsOnWay_NOR_Cue'
+`define ArtilleryConfirm_DAK	SoundCue'AUD_VOX_Chatter_GerGer_04.Radio.CMD_INF_RadioArtilleryOnWay_NOR_Cue'
+`define RocketsConfirm_DAK	SoundCue'AUD_VOX_Chatter_GerGer_04.Radio.CMD_INF_RadioRocketsOnWay_NOR_Cue'
+`define DenyArtillery_DAK		SoundCue'AUD_VOX_Chatter_GerGer_04.Radio.CMD_INF_RadioDenySupport_NOR_Cue'
+`define NoArtillery_DAK		SoundCue'AUD_VOX_Chatter_GerGer_04.Radio.CMD_INF_RadioNoArtyLeft_NOR_Cue'
+
+
+
+//////////////////////////////////////////////////////////////////////////////////////// DRGameInfo ////////////////////////////////////////////////////////////////////////////////////
+
+`define CI_RIFLEMAN			40
+`define CI_ASSAULT				41
+`define CI_MACHINEGUNNER		42
+`define CI_ENGINEER			43
+`define CI_ANTITANK			44
+`define CI_SNIPER				45
+`define CI_SQUADLEADER		46
+`define CI_TEAMLEADER			47
+`define CI_TANKCREW			48
+`define CI_TANKCOMMANDER		49
+`define CI_TANKSQUADLEADER	50
+`define CI_TANKTEAMLEADER		51
+
+`define UK_RIFLEMAN			class'DRPawnBritRifleman'
+`define UK_ASSAULT			class'DRPawnBritAssault'
+`define UK_MACHINEGUNNER		class'DRPawnBritMachineGunner'
+`define UK_ENGINEER			class'DRPawnBritEngineer'
+`define UK_SNIPER				class'DRPawnBritSniper'
+`define UK_ANTITANK			class'DRPawnBritAntiTank'
+`define UK_SQUADLEADER		class'DRPawnBritSquadLeader'
+`define UK_TEAMLEADER		class'DRPawnBritCommander'
+`define UK_TANKCREW			class'DRPawnTanker'
+`define DAK_RIFLEMAN			class'DRPawnGerRifleman'
+`define DAK_ASSAULT			class'DRPawnGerAssault'
+`define DAK_MACHINEGUNNER	class'DRPawnGerMachineGunner'
+`define DAK_ENGINEER			class'DRPawnGerEngineer'
+`define DAK_SNIPER			class'DRPawnGerSniper'
+`define DAK_ANTITANK			class'DRPawnGerAntiTank'
+`define DAK_SQUADLEADER		class'DRPawnGerSquadLeader'
+`define DAK_TEAMLEADER		class'DRPawnGerCommander'
+`define DAK_TANKCREW			class'DRPawnTanker'
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////// DRRI /////////////////////////////////////////////////////////////////////////////////////////////
+
+`define SMG_UK				class'DRWep_Thompson'
+`define SMG_DAK				class'DRWep_MP40'
+`define SMGELITE_UK			class'DRWep_ThompsonElite'
+`define SMGELITE_DAK			class'DRWep_MP40'
+`define RIFLE_UK				class'DRWep_Enfield'
+`define RIFLE_DAK				class'DRWep_Kar'
+`define RIFLESNIPER_UK			class'DRWep_Enfield'
+`define RIFLESNIPER_DAK		class'DRWep_KarSniper'
+`define RIFLEAT_UK				class'DRWep_Boys'
+`define RIFLEAT_DAK			class'DRWep_Kar'
+`define LMG_UK				class'DRWep_Bren'
+`define LMG_DAK				class'DRWep_MG34'
+`define PISTOL_UK				class'DRWep_Webley'
+`define PISTOL_DAK				class'DRWep_P38'
+`define GRENADE_UK			class'RSGame.RSWeap_Mk2_Grenade'
+`define GRENADE_DAK			class'ROGame.ROWeap_M1939_Grenade'
+`define GRENADEAT_UK			class'ROGame.ROWeap_RPG40_ATGrenade'
+`define GRENADEAT_DAK		class'ROGame.ROWeap_HHL3_ATGrenade'
+`define GRENADESMOKE_UK		class'RSGame.RSWeap_M8_Smoke'
+`define GRENADESMOKE_DAK	class'ROGame.ROWeap_NG39_Grenade'
+`define SATCHEL_UK			class'DRWep_Dynamite'
+`define SATCHEL_DAK			class'DRWep_Satchel'
+`define BINOCULARS			class'DRWep_Binoculars'
+
+
+
+////////////////////////////////////////////////////////////////////////////////// DRWeapon //////////////////////////////////////////////////////////////////////////////
+
+`define WI_SMG_UK						100
+`define WI_SMGELITE_UK				100
+`define WI_SMG_DAK					101
+`define WI_RIFLE_UK					102
+`define WI_RIFLE_DAK					103
+`define WI_RIFLESNIPER_UK				104
+`define WI_RIFLESNIPER_DAK				105
+`define WI_RIFLEAT_UK					106
+`define WI_RIFLEAT_DAK					107
+`define WI_LMG_UK						108
+`define WI_LMG_DAK					109
+`define WI_PISTOL_UK					110
+`define WI_PISTOL_DAK					111
+`define WI_GRENADE_UK				112
+`define WI_GRENADE_DAK				113
+`define WI_GRENADEAT_UK				114
+`define WI_GRENADEAT_DAK				115
+`define WI_GRENADESMOKE_UK			116
+`define WI_GRENADESMOKE_DAK			117
+`define WI_SATCHEL_UK					118
+`define WI_SATCHEL_DAK				129
+`define WI_BINOCULARS					120
+`define WI_HMG_UK						121
+`define WI_HMG_DAK					122

@@ -1,0 +1,2 @@
+
+class DRWep_Satchel_Attach extends ROWeapAttach_SatchelGer_3kg;

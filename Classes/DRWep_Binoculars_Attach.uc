@@ -1,0 +1,2 @@
+
+class DRWep_Binoculars_Attach extends ROItemAttach_Binoculars;

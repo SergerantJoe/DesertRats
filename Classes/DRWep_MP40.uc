@@ -1,0 +1,214 @@
+
+class DRWep_MP40 extends DRProjectileWeapon
+	abstract;
+
+simulated function SightIndexUpdated()
+{
+	if( SightRotController != none )
+	{
+		SightRotController.BoneRotation.Roll = SightRanges[SightRangeIndex].SightPitch * -1;
+	}
+	
+	IronSightPosition.Z=SightRanges[SightRangeIndex].SightPositionOffset;
+	PlayerViewOffset.Z=SightRanges[SightRangeIndex].SightPositionOffset;
+}
+
+defaultproperties
+{
+	WeaponContentClass(0)="DesertRats.DRWep_MP40_ActualContent"
+	
+	RoleSelectionImage(0)=MaterialInstanceConstant'UI_Mats.RoleSelectMenu.Ger_wp_MP40_UPGRD1_MIC'
+	
+	WeaponClassType=ROWCT_SMG
+	TeamIndex=`AXIS_TEAM_INDEX
+	
+	Category=ROIC_Primary
+	Weight=3.97 //KG
+	InvIndex=`WI_SMG_DAK
+	InventoryWeight=3
+	
+	PlayerIronSightFOV=45.0
+	PreFireTraceLength=1250 //25 Meters
+	FiringStatesArray(0)=WeaponFiring
+	WeaponFireTypes(0)=EWFT_Custom
+	WeaponProjectiles(0)=class'MP40Bullet'
+	FireInterval(0)=+0.12
+	Spread(0)=0.0095
+	WeaponDryFireSnd=SoundCue'AUD_Firearms.DryFire.DryFire_SMG_Cue'
+	FiringStatesArray(ALTERNATE_FIREMODE)=none
+	WeaponProjectiles(ALTERNATE_FIREMODE)=none
+	FireInterval(ALTERNATE_FIREMODE)=+0.12
+	Spread(ALTERNATE_FIREMODE)=0
+	ShoulderedSpreadMod=6.0
+	HippedSpreadMod=10.0
+	ShoulderedCasualSpreadMod=10.0
+	HippedCasualSpreadMod=20.0
+	MinBurstAmount=2
+	MaxBurstAmount=4
+	BurstWaitTime=1.0
+	AISpreadScale=20.0
+	maxRecoilPitch=170
+	minRecoilPitch=65
+	maxRecoilYaw=130
+	minRecoilYaw=-85
+	RecoilRate=0.075
+	RecoilMaxYawLimit=500
+	RecoilMinYawLimit=65035
+	RecoilMaxPitchLimit=750
+	RecoilMinPitchLimit=64785
+	RecoilISMaxYawLimit=500
+	RecoilISMinYawLimit=65035
+	RecoilISMaxPitchLimit=500
+	RecoilISMinPitchLimit=65035
+	RecoilBlendOutRatio=0.45
+	PostureHippedRecoilModifer=2.0
+	PostureShoulderRecoilModifer=1.75
+	InstantHitDamage(0)=50
+	InstantHitDamage(1)=50
+	InstantHitDamageTypes(0)=class'RODmgType_MP40Bullet'
+	InstantHitDamageTypes(1)=class'RODmgType_MP40Bullet'
+	MuzzleFlashSocket=MuzzleFlashSocket
+	MuzzleFlashPSCTemplate=ParticleSystem'FX_WEP_Gun_Two.MuzzleFlashes.FX_WEP_Gun_A_MuzzleFlash_1stP_mp40'
+	MuzzleFlashDuration=0.33
+	MuzzleFlashLightClass=class'ROGame.RORifleMuzzleFlashLight'
+	ShellEjectSocket=ShellEjectSocket
+	ShellEjectPSCTemplate=ParticleSystem'FX_WEP_Gun_Two.ShellEjects.FX_Wep_A_ShellEject_PhysX_Ger_MP40'
+	CRef_WeaponFireSndFirstPerson[0]="AUD_Firearms_SMG_MP40.Fire_Surround.SMG_MP40_Fire_Single_Sur_Cue"
+	CRef_WeaponFireSndFirstPerson[1]="AUD_Firearms_SMG_MP40.Fire_Surround.SMG_MP40_Fire_Single_Sur_Cue"
+	bHasIronSights=true;
+	WeaponPutDownAnim=MP40_putaway
+	WeaponEquipAnim=MP40_pullout
+	WeaponDownAnim=MP40_Down
+	WeaponUpAnim=MP40_Up
+	WeaponFireAnim(0)=MP40_shoot
+	WeaponFireAnim(1)=MP40_shoot
+	WeaponFireLastAnim=MP40_shootLAST
+	WeaponFireShoulderedAnim(0)=MP40_shoot
+	WeaponFireShoulderedAnim(1)=MP40_shoot
+	WeaponFireLastShoulderedAnim=MP40_shootLAST
+	WeaponFireSightedAnim(0)=MP40_iron_shoot
+	WeaponFireSightedAnim(1)=MP40_iron_shoot
+	WeaponFireLastSightedAnim=MP40_iron_shootLAST
+	WeaponIdleAnims(0)=MP40_shoulder_idle
+	WeaponIdleAnims(1)=MP40_shoulder_idle
+	WeaponIdleShoulderedAnims(0)=MP40_shoulder_idle
+	WeaponIdleShoulderedAnims(1)=MP40_shoulder_idle
+	WeaponIdleSightedAnims(0)=MP40_iron_idle
+	WeaponIdleSightedAnims(1)=MP40_iron_idle
+	WeaponCrawlingAnims(0)=MP40_CrawlF
+	WeaponCrawlStartAnim=MP40_Crawl_into
+	WeaponCrawlEndAnim=MP40_Crawl_out
+	WeaponReloadEmptyMagAnim=MP40_reloadempty
+	WeaponReloadNonEmptyMagAnim=MP40_reloadhalf
+	WeaponRestReloadEmptyMagAnim=MP40_reloadempty_rest
+	WeaponRestReloadNonEmptyMagAnim=MP40_reloadhalf_rest
+	WeaponAmmoCheckAnim=MP40_ammocheck
+	WeaponRestAmmoCheckAnim=MP40_ammocheck_rest
+	WeaponSprintStartAnim=MP40_sprint_into
+	WeaponSprintLoopAnim=MP40_Sprint
+	WeaponSprintEndAnim=MP40_sprint_out
+	Weapon1HSprintStartAnim=MP40_ger_sprint_into
+	Weapon1HSprintLoopAnim=MP40_ger_sprint
+	Weapon1HSprintEndAnim=MP40_ger_sprint_out
+	WeaponMantleOverAnim=MP40_Mantle
+	WeaponRestAnim=MP40_rest_idle
+	WeaponEquipRestAnim=MP40_pullout_rest
+	WeaponPutDownRestAnim=MP40_putaway_rest
+	WeaponBlindFireRightAnim=MP40_BF_Right_Shoot
+	WeaponBlindFireLeftAnim=MP40_BF_Left_Shoot
+	WeaponBlindFireUpAnim=MP40_BF_up_Shoot
+	WeaponIdleToRestAnim=MP40_idleTOrest
+	WeaponRestToIdleAnim=MP40_restTOidle
+	WeaponRestToBlindFireRightAnim=MP40_restTOBF_Right
+	WeaponRestToBlindFireLeftAnim=MP40_restTOBF_Left
+	WeaponRestToBlindFireUpAnim=MP40_restTOBF_up
+	WeaponBlindFireRightToRestAnim=MP40_BF_Right_TOrest
+	WeaponBlindFireLeftToRestAnim=MP40_BF_Left_TOrest
+	WeaponBlindFireUpToRestAnim=MP40_BF_up_TOrest
+	WeaponBFLeftToUpTransAnim=MP40_BFleft_toBFup
+	WeaponBFRightToUpTransAnim=MP40_BFright_toBFup
+	WeaponBFUpToLeftTransAnim=MP40_BFup_toBFleft
+	WeaponBFUpToRightTransAnim=MP40_BFup_toBFright
+	WeaponBF_Rest2LeftReady=MP40_restTO_L_ready
+	WeaponBF_LeftReady2LeftFire=MP40_L_readyTOBF_L
+	WeaponBF_LeftFire2LeftReady=MP40_BF_LTO_L_ready
+	WeaponBF_LeftReady2Rest=MP40_L_readyTOrest
+	WeaponBF_Rest2RightReady=MP40_restTO_R_ready
+	WeaponBF_RightReady2RightFire=MP40_R_readyTOBF_R
+	WeaponBF_RightFire2RightReady=MP40_BF_RTO_R_ready
+	WeaponBF_RightReady2Rest=MP40_R_readyTOrest
+	WeaponBF_Rest2UpReady=MP40_restTO_Up_ready
+	WeaponBF_UpReady2UpFire=MP40_Up_readyTOBF_Up
+	WeaponBF_UpFire2UpReady=MP40_BF_UpTO_Up_ready
+	WeaponBF_UpReady2Rest=MP40_Up_readyTOrest
+	WeaponBF_LeftReady2Up=MP40_L_ready_toUp_ready
+	WeaponBF_LeftReady2Right=MP40_L_ready_toR_ready
+	WeaponBF_UpReady2Left=MP40_Up_ready_toL_ready
+	WeaponBF_UpReady2Right=MP40_Up_ready_toR_ready
+	WeaponBF_RightReady2Up=MP40_R_ready_toUp_ready
+	WeaponBF_RightReady2Left=MP40_R_ready_toL_ready
+	WeaponBF_LeftReady2Idle=MP40_L_readyTOidle
+	WeaponBF_RightReady2Idle=MP40_R_readyTOidle
+	WeaponBF_UpReady2Idle=MP40_Up_readyTOidle
+	WeaponBF_Idle2UpReady=MP40_idleTO_Up_ready
+	WeaponBF_Idle2LeftReady=MP40_idleTO_L_ready
+	WeaponBF_Idle2RightReady=MP40_idleTO_R_ready
+	WeaponMeleeAnims(0)=MP40_Bash
+	WeaponMeleeHardAnim=MP40_BashHard
+	MeleePullbackAnim=MP40_Pullback
+	MeleeHoldAnim=MP40_Pullback_Hold
+	ReloadMagazinEmptyCameraAnim=CameraAnim'1stperson_Cameras.Anim.Camera_MP40_reloadempty'
+	EquipTime=+0.75
+	PutDownTime=+0.50
+	bDebugWeapon = false
+	BoltControllerNames[0]=BoltSlide_MP40
+	BoltControllerNames[1]=BoltSlide_MP40_2
+	BoltControllerNames[2]=BoltSlide_MP40_3
+	BoltControllerNames[3]=BoltSlide_MP40_4
+	ISFocusDepth=20
+	ISFocusBlendRadius=8
+	AmmoClass=class'ROAmmo_9x19_MP40Mag'
+	MaxAmmoCount=32
+	bUsesMagazines=true
+	InitialNumPrimaryMags=6
+	bPlusOneLoading=false
+	bCanReloadNonEmptyMag=true
+	PenetrationDepth=14.5
+	MaxPenetrationTests=3
+	MaxNumPenetrations=2
+	PerformReloadPct=0.90f
+	PlayerViewOffset=(X=0.0,Y=8.0,Z=-5)
+	ZoomInRotation=(Pitch=-910,Yaw=0,Roll=2910)
+	ShoulderedTime=0.35
+	ShoulderedPosition=(X=0.5,Y=4.0,Z=-2.0)// (X=0,Y=1,Z=-1.4)
+	ShoulderRotation=(Pitch=-500,Yaw=0,Roll=2500)
+	IronSightPosition=(X=0,Y=0,Z=0.04)
+	bUsesFreeAim=true
+	FreeAimMaxYawLimit=2000
+	FreeAimMinYawLimit=63535
+	FreeAimMaxPitchLimit=1500
+	FreeAimMinPitchLimit=64035
+	FreeAimISMaxYawLimit=500
+	FreeAimISMinYawLimit=65035
+	FreeAimISMaxPitchLimit=350
+	FreeAimISMinPitchLimit=65185
+	FullFreeAimISMaxYaw=350
+	FullFreeAimISMinYaw=65185
+	FullFreeAimISMaxPitch=250
+	FullFreeAimISMinPitch=65285
+	FreeAimSpeedScale=0.35
+	FreeAimISSpeedScale=0.4
+	FreeAimHipfireOffsetX=35
+	Begin Object Class=ForceFeedbackWaveform Name=ForceFeedbackWaveformShooting1
+		Samples(0)=(LeftAmplitude=30,RightAmplitude=30,LeftFunction=WF_Constant,RightFunction=WF_Constant,Duration=0.100)
+	End Object
+	WeaponFireWaveForm=ForceFeedbackWaveformShooting1
+	CollisionCheckLength=36.5
+	FireCameraAnim[0]=CameraAnim'1stperson_Cameras.Anim.Camera_MP40_Shoot'
+	FireCameraAnim[1]=CameraAnim'1stperson_Cameras.Anim.Camera_MP40_Shoot'
+	SightRotControlName=Sight_Rotation
+	SightRanges[0]=(SightRange=100,SightPitch=0,SightPositionOffset=0.04,AddedPitch=55)
+	SightRanges[1]=(SightRange=200,SightPitch=16384,SightPositionOffset=-0.075,AddedPitch=97)
+	WeaponProficiencyLevelReloadModifiers=(1.0000,0.9967,0.9933,0.9900,0.9867,0.9833,0.9800,0.9767,0.9733,0.9700,0.9667,0.9633,0.9600,0.9567,0.9533,0.9500,0.9467,0.9433,0.9400,0.9367,0.9333,0.9300,0.9267,0.9233,0.9200,0.9167,0.9133,0.9100,0.9067,0.9033,0.9000,0.8967,0.8933,0.8900,0.8867,0.8833,0.8800,0.8767,0.8733,0.8700,0.8667,0.8633,0.8600,0.8567,0.8533,0.8500,0.8467,0.8433,0.8400,0.8367,0.8333)
+}
+

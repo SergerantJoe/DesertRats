@@ -1,0 +1,73 @@
+
+class DRTeamInfo extends ROTeamInfo;
+
+simulated function class<ROAerialReconPlane> GetAerialReconPlaneClass()
+{
+	if ( TeamIndex == `AXIS_TEAM_INDEX )
+	{
+		return class'ROAxisAerialReconPlane';
+	}
+	else
+	{
+		return class'RSAlliedAerialReconPlane';
+	}
+}
+
+defaultproperties
+{
+	AxisLowMoralePlayList={(		PlaylistName=Axis_LowMorale,
+							PermutationIndex=-1,
+							CRef_MusicTracks=(		"AUD_Music_Ger_Elevator_L.G_Elevator_L_Cue",
+												"AUD_Music_Ger_Fallen_L.G_Fallen_L_Cue",
+												"AUD_Music_Ger_Kommissars_L.G_Komm_L_Cue",
+												"AUD_Music_Ger_Pavlovs_L.G_Pavlov_L_Cue",
+												"AUD_Music_Ger_Spartanovka_L.G_Spartanovka_L_Cue",
+												"AUD_Music_Ger_Station1_L.G_Station1_L_Cue",
+												"AUD_Music_Ger_Steppe_L.G_Steppe_L_Cue"
+											))}
+	AxisNormalMoralePlayList={(	PlaylistName=Axis_NeutralMorale,
+							PermutationIndex=-1,
+							CRef_MusicTracks=(		"AUD_Music_Ger_Elevator_N.G_Elevator_N_Cue",
+												"AUD_Music_Ger_Fallen_N.G_Fallen_N_Cue",
+												"AUD_Music_Ger_Kommissars_N.G_Komm_N_Cue",
+												"AUD_Music_Ger_Pavlovs_N.G_Pavlov_N_Cue",
+												"AUD_Music_Ger_Spartanovka_N.G_Spartanovka_N_Cue",
+												"AUD_Music_Ger_Station1_N.G_Station1_N_Cue",
+												"AUD_Music_Ger_Steppe_N.G_Steppe_N_Cue"
+											))}
+	AxisHighMoralePlayList={(		PlaylistName=Axis_HighMorale,
+							PermutationIndex=-1,
+							CRef_MusicTracks=(		"AUD_Music_Ger_Elevator_H.G_Elevator_H_Cue",
+												"AUD_Music_Ger_Fallen_H.G_Fallen_H_Cue",
+												"AUD_Music_Ger_Kommissars_H.G_Komm_H_Cue",
+												"AUD_Music_Ger_Pavlovs_H.G_Pavlov_H_Cue",
+												"AUD_Music_Ger_Spartanovka_H.G_Spartanovka_H_Cue",
+												"AUD_Music_Ger_Station1_H.G_Station1_H_Cue",
+												"AUD_Music_Ger_Steppe_H.G_Steppe_H_Cue"
+											))}
+	AlliesLowMoralePlayList={(		PlaylistName=Allies_LowMorale,
+							PermutationIndex=-1,
+							CRef_MusicTracks=(		"AUD_RS_Music_USA_1_L.U_1_L_Cue",
+												"AUD_RS_Music_USA_2_L.U_2_L_Cue",
+												"AUD_RS_Music_USA_3_L.U_3_L_Cue"
+											))}
+	AlliesNormalMoralePlayList={(	PlaylistName=Allies_NeutralMorale,
+							PermutationIndex=-1,
+							CRef_MusicTracks=(		"AUD_RS_Music_USA_1_N.U_1_N_Cue",
+												"AUD_RS_Music_USA_2_N.U_2_N_Cue",
+												"AUD_RS_Music_USA_3_N.U_3_N_Cue"
+												))}
+	AlliesHighMoralePlayList={(	PlaylistName=Allies_HighMorale,
+							PermutationIndex=-1,
+							CRef_MusicTracks=(		"AUD_RS_Music_USA_1_H.U_1_H_Cue",
+												"AUD_RS_Music_USA_2_H.U_2_H_Cue",
+												"AUD_RS_Music_USA_3_H.U_3_H_Cue"
+											)
+	)}
+	
+	AxisHigherMoraleTransitionTrack=(TheSoundCue=SoundCue'Music_Ger.G_Trans_2H_Cue',bAutoPlay=true,bPersistentAcrossLevels=false,FadeInTime=0.1,FadeInVolumeLevel=0.8,FadeOutTime=0.1,FadeOutVolumeLevel=0.0)
+	AxisLowerMoraleTransitionTrack=(TheSoundCue=SoundCue'Music_Ger.G_Trans_2L_Cue',bAutoPlay=true,bPersistentAcrossLevels=false,FadeInTime=0.1,FadeInVolumeLevel=0.8,FadeOutTime=0.1,FadeOutVolumeLevel=0.0)
+	
+	AlliesHigherMoraleTransitionTrack=(TheSoundCue=SoundCue'Music_RS_USA.U_Trans_2H_Cue',bAutoPlay=true,bPersistentAcrossLevels=false,FadeInTime=0.1,FadeInVolumeLevel=0.8,FadeOutTime=0.1,FadeOutVolumeLevel=0.0)
+	AlliesLowerMoraleTransitionTrack=(TheSoundCue=SoundCue'Music_RS_USA.U_Trans_2L_Cue',bAutoPlay=true,bPersistentAcrossLevels=false,FadeInTime=0.1,FadeInVolumeLevel=0.8,FadeOutTime=0.1,FadeOutVolumeLevel=0.0)
+}

@@ -1,0 +1,152 @@
+
+`include(DRMacros.uci)
+
+var array< class<Pawn> > BritUniforms;
+var array< class<Pawn> > GerUniforms;
+
+var string BotNames_Ger[32];
+var string BotNames_Brit[32];
+
+function class<Pawn> GetPlayerClass(Controller C)
+{
+	local DRPlayerReplicationInfo DRPRI;
+	local int ClassIndex;
+	
+	DRPRI = DRPlayerReplicationInfo(C.PlayerReplicationInfo);
+	ClassIndex = DRPRI.RoleInfo.ClassIndex;
+	
+	if ( DRPRI != none )
+	{
+		if ( DRPRI.RoleInfo != none )
+		{
+			if ( DRPRI.Team.TeamIndex == `ALLIES_TEAM_INDEX )
+			{
+				return BritUniforms[ClassIndex];
+			}
+			else if ( DRPRI.Team.TeamIndex == `AXIS_TEAM_INDEX )
+			{
+				return GerUniforms[ClassIndex];
+			}
+		}
+	}
+	
+	return DefaultPawnClass;
+}
+
+function string GetDefaultBotName(Controller C, byte TeamIndex, byte NameIndex)
+{
+	if( ROAIController( C ) == none )
+	{
+		return "Null ROAIController";
+	}
+	else
+	{
+		ROAIController( C ).bNameInitialized = true;
+	}
+	
+	if( TeamIndex == `AXIS_TEAM_INDEX )
+	{
+		return BotNames_Ger[NameIndex - 1];
+	}
+	else if ( TeamIndex == `ALLIES_TEAM_INDEX )
+	{
+		return BotNames_Brit[NameIndex - 1];
+	}
+	
+	return string(C.Name);
+}
+
+defaultproperties
+{
+	BritUniforms(`CI_RIFLEMAN)			=	`UK_RIFLEMAN
+	BritUniforms(`CI_ASSAULT)			=	`UK_ASSAULT
+	BritUniforms(`CI_MACHINEGUNNER)		=	`UK_MACHINEGUNNER
+	BritUniforms(`CI_ENGINEER)			=	`UK_ENGINEER
+	BritUniforms(`CI_ANTITANK)			=	`UK_ANTITANK
+	BritUniforms(`CI_SNIPER)				=	`UK_SNIPER
+	BritUniforms(`CI_SQUADLEADER)		=	`UK_SQUADLEADER
+	BritUniforms(`CI_TEAMLEADER)		=	`UK_TEAMLEADER
+	BritUniforms(`CI_TANKCREW)			=	`UK_TANKCREW
+	BritUniforms(`CI_TANKCOMMANDER)	=	`UK_TANKCREW
+	BritUniforms(`CI_TANKSQUADLEADER)	=	`UK_TANKCREW
+	BritUniforms(`CI_TANKTEAMLEADER)	=	`UK_TANKCREW
+	
+	GerUniforms(`CI_RIFLEMAN)			=	`DAK_RIFLEMAN
+	GerUniforms(`CI_ASSAULT)			=	`DAK_ASSAULT
+	GerUniforms(`CI_MACHINEGUNNER)		=	`DAK_MACHINEGUNNER
+	GerUniforms(`CI_ENGINEER)			=	`DAK_ENGINEER
+	GerUniforms(`CI_ANTITANK)			=	`DAK_ANTITANK
+	GerUniforms(`CI_SNIPER)				=	`DAK_SNIPER
+	GerUniforms(`CI_SQUADLEADER)		=	`DAK_SQUADLEADER
+	GerUniforms(`CI_TEAMLEADER)		=	`DAK_TEAMLEADER
+	GerUniforms(`CI_TANKCREW)			=	`DAK_TANKCREW
+	GerUniforms(`CI_TANKCOMMANDER)	=	`DAK_TANKCREW
+	GerUniforms(`CI_TANKSQUADLEADER)	=	`DAK_TANKCREW
+	GerUniforms(`CI_TANKTEAMLEADER)	=	`DAK_TANKCREW
+	
+	BotNames_Brit(0)=		"Wallace"
+	BotNames_Brit(1)=		"Ritchie"
+	BotNames_Brit(2)=		"Boyd"
+	BotNames_Brit(3)=		"Stevenson"
+	BotNames_Brit(4)=		"Ross"
+	BotNames_Brit(5)=		"MacGregor"
+	BotNames_Brit(6)=		"Hopkins"
+	BotNames_Brit(7)=		"Griffin"
+	BotNames_Brit(8)=		"Collins"
+	BotNames_Brit(9)=		"Abbott"
+	BotNames_Brit(10)=		"Bremner"
+	BotNames_Brit(11)=		"Cook"
+	BotNames_Brit(12)=		"Sullivan"
+	BotNames_Brit(13)=		"Thompson"
+	BotNames_Brit(14)=		"Stuart"
+	BotNames_Brit(15)=		"Kent"
+	BotNames_Brit(16)=		"Price"
+	BotNames_Brit(17)=		"Carver"
+	BotNames_Brit(18)=		"Fleming"
+	BotNames_Brit(19)=		"Hoyt"
+	BotNames_Brit(20)=		"Maxwell"
+	BotNames_Brit(21)=		"Carlyle"
+	BotNames_Brit(22)=		"Wallcroft"
+	BotNames_Brit(23)=		"Stevenson"
+	BotNames_Brit(24)=		"Smith"
+	BotNames_Brit(25)=		"Riggs"
+	BotNames_Brit(26)=		"Pritchard"
+	BotNames_Brit(27)=		"Henderson"
+	BotNames_Brit(28)=		"Heath"
+	BotNames_Brit(29)=		"Flynn"
+	BotNames_Brit(30)=		"Bartlett"
+	BotNames_Brit(31)=		"Welsh"
+	
+	BotNames_Ger(0)=		"Erhard"
+	BotNames_Ger(1)=		"Viktor"
+	BotNames_Ger(2)=		"Manfred"
+	BotNames_Ger(3)=		"Otto"
+	BotNames_Ger(4)=		"Johannes"
+	BotNames_Ger(5)=		"Erich"
+	BotNames_Ger(6)=		"Bruno"
+	BotNames_Ger(7)=		"Max"
+	BotNames_Ger(8)=		"Hermann"
+	BotNames_Ger(9)=		"Horst"
+	BotNames_Ger(10)=		"Ernst"
+	BotNames_Ger(11)=		"Wilhelm"
+	BotNames_Ger(12)=		"Heinrich"
+	BotNames_Ger(13)=		"Heinz"
+	BotNames_Ger(14)=		"Hans"
+	BotNames_Ger(15)=		"Werner"
+	BotNames_Ger(16)=		"Paul"
+	BotNames_Ger(17)=		"Axel"
+	BotNames_Ger(18)=		"Gerhard"
+	BotNames_Ger(19)=		"Friedrich"
+	BotNames_Ger(20)=		"Georg"
+	BotNames_Ger(21)=		"Kurt"
+	BotNames_Ger(22)=		"Hugo"
+	BotNames_Ger(23)=		"Walter"
+	BotNames_Ger(24)=		"Gunther"
+	BotNames_Ger(25)=		"Gustav"
+	BotNames_Ger(26)=		"Karl"
+	BotNames_Ger(27)=		"Klaus"
+	BotNames_Ger(28)=		"Fritz"
+	BotNames_Ger(29)=		"Dieter"
+	BotNames_Ger(30)=		"Franz"
+	BotNames_Ger(31)=		"Ludwig"
+}

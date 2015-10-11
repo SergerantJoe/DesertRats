@@ -1,0 +1,179 @@
+
+class DRPlayerController extends ROPlayerController;
+
+`include(DRMacros.uci)
+
+var(Sounds) SoundCue AxisLossTheme;
+var(Sounds) SoundCue AlliesLossTheme;
+
+reliable client function MatchWon(byte WinningTeam, byte WinCondition, optional bool bUseCapturesForTieBreaking, optional int AxisTeamPointsTotal, optional int AlliesTeamPointsTotal,
+								  optional int AxisRemainingReinforcements, optional int AlliesRemainingReinforcements, optional int AxisTotalObjectivesCaptured,
+								  optional int AlliesTotalObjectivesCaptured, optional int RoundTime, optional int AxisFastestWinTime, optional int AlliesFastestWinTime,
+								  optional float AxisRoundScore, optional float AlliesRoundScore, optional int AxisTotalTime, optional int AlliesTotalTime,
+								  optional byte AxisReachedObjectiveIndex, optional byte AlliesReachedObjectiveIndex, optional int AxisEnemiesKilled,
+								  optional int AlliesEnemiesKilled, optional int AxisEnemiesRemaining, optional int AlliesEnemiesRemaining )
+{
+	if ( WorldInfo.NetMode == NM_DedicatedServer )
+	{
+		return;
+	}
+
+	bWaitingForVictoryMusicToEnd = true;
+
+	if ( WinningTeam == `AXIS_TEAM_INDEX )
+	{
+		if( PlayerReplicationInfo.Team.TeamIndex == WinningTeam )
+		{
+			PlaySound(AxisWinTheme, true);
+			SetTimer(AxisWinTheme.GetCueDuration(),, 'ClearWaitingForVictoryMusicToEnd');
+			DuckMoraleMusic(0.05, 0.0, AxisWinTheme.GetCueDuration());
+		}
+		else
+		{
+			PlaySound(AlliesLossTheme, true);
+			SetTimer(AlliesLossTheme.GetCueDuration(),, 'ClearWaitingForVictoryMusicToEnd');
+			DuckMoraleMusic(0.05, 0.0, AlliesLossTheme.GetCueDuration());
+		}
+	}
+	else if ( WinningTeam == `ALLIES_TEAM_INDEX )
+	{
+		if( PlayerReplicationInfo.Team.TeamIndex == WinningTeam )
+		{
+			PlaySound(AlliesWinTheme, true);
+			SetTimer(AlliesWinTheme.GetCueDuration(),, 'ClearWaitingForVictoryMusicToEnd');
+			DuckMoraleMusic(0.05, 0.0, AlliesWinTheme.GetCueDuration());
+		}
+		else
+		{
+			PlaySound(AxisLossTheme, true);
+			SetTimer(AxisLossTheme.GetCueDuration(),, 'ClearWaitingForVictoryMusicToEnd');
+			DuckMoraleMusic(0.05, 0.0, AxisLossTheme.GetCueDuration());
+		}
+	}
+
+ 	ShowMatchWinScreen(WinningTeam, WinCondition, bUseCapturesForTieBreaking, AxisTeamPointsTotal, AlliesTeamPointsTotal, AxisRemainingReinforcements,
+					   AlliesRemainingReinforcements, AxisTotalObjectivesCaptured, AlliesTotalObjectivesCaptured, RoundTime,
+					   AxisFastestWinTime, AlliesFastestWinTime, AxisRoundScore, AlliesRoundScore, AxisTotalTime,
+					   AlliesTotalTime, AxisReachedObjectiveIndex, AlliesReachedObjectiveIndex, AxisEnemiesKilled,
+					   AlliesEnemiesKilled, AxisEnemiesRemaining, AlliesEnemiesRemaining );
+}
+
+simulated function ProcessROMatchWon(ROMatchWonParameters iROParameters)
+{
+	local int WinningTeam;
+
+	bWaitingForVictoryMusicToEnd = true;
+	WinningTeam = iROParameters.WinningTeam;
+
+	if ( WinningTeam == `AXIS_TEAM_INDEX )
+	{
+		if( PlayerReplicationInfo.Team.TeamIndex == WinningTeam )
+		{
+			PlaySound(AxisWinTheme, true);
+			SetTimer(AxisWinTheme.GetCueDuration(),, 'ClearWaitingForVictoryMusicToEnd');
+			DuckMoraleMusic(0.05, 0.0, AxisWinTheme.GetCueDuration());
+		}
+		else
+		{
+			PlaySound(AlliesLossTheme, true);
+			SetTimer(AlliesLossTheme.GetCueDuration(),, 'ClearWaitingForVictoryMusicToEnd');
+			DuckMoraleMusic(0.05, 0.0, AlliesLossTheme.GetCueDuration());
+		}
+	}
+	else if ( WinningTeam == `ALLIES_TEAM_INDEX )
+	{
+		if( PlayerReplicationInfo.Team.TeamIndex == WinningTeam )
+		{
+			PlaySound(AlliesWinTheme, true);
+			SetTimer(AlliesWinTheme.GetCueDuration(),, 'ClearWaitingForVictoryMusicToEnd');
+			DuckMoraleMusic(0.05, 0.0, AlliesWinTheme.GetCueDuration());
+		}
+		else
+		{
+			PlaySound(AxisLossTheme, true);
+			SetTimer(AxisLossTheme.GetCueDuration(),, 'ClearWaitingForVictoryMusicToEnd');
+			DuckMoraleMusic(0.05, 0.0, AxisLossTheme.GetCueDuration());
+		}
+	}
+}
+
+simulated function UpdateStats()
+{
+	
+}
+
+defaultproperties
+{
+	CheatClass=class'ROCheatManager'
+	
+	AlliesLocalizedVoicePacks[0]=	`UK_1
+	AlliesLocalizedVoicePacks[1]=	`UK_2
+	AlliesLocalizedVoicePacks[2]=	`UK_3
+	AlliesTeamVoicePacks[0]=		`UK_1
+	AlliesTeamVoicePacks[1]=		`UK_2
+	AlliesTeamVoicePacks[2]=		`UK_3
+	AlliesNativeVoicePacks[0]=	`UK_1
+	AlliesNativeVoicePacks[1]=	`UK_2
+	AlliesNativeVoicePacks[2]=	`UK_3
+	
+	AxisLocalizedVoicePacks[0]=	`DAK_1
+	AxisLocalizedVoicePacks[1]=	`DAK_2
+	AxisLocalizedVoicePacks[2]=	`DAK_3
+	AxisTeamVoicePacks[0]=		`DAK_1
+	AxisTeamVoicePacks[1]=		`DAK_2
+	AxisTeamVoicePacks[2]=		`DAK_3
+	AxisNativeVoicePacks[0]=		`DAK_1
+	AxisNativeVoicePacks[1]=		`DAK_2
+	AxisNativeVoicePacks[2]=		`DAK_3
+	
+	ReconInRouteSounds[0]=`ReconInRoute_DAK
+	ReconInRouteSounds[1]=`ReconInRoute_UK
+	ReconInRouteSounds[2]=`ReconInRoute_DAK
+	ReconInRouteSounds[3]=`ReconInRoute_UK
+	
+	ReconDeniedSounds[0]=`ReconDenied_DAK
+	ReconDeniedSounds[1]=`ReconDenied_UK
+	ReconDeniedSounds[2]=`ReconDenied_DAK
+	ReconDeniedSounds[3]=`ReconDenied_UK
+	
+	MortarsConfirmSounds[0]=`MortarsConfirm_DAK
+	MortarsConfirmSounds[1]=`MortarsConfirm_UK
+	MortarsConfirmSounds[2]=`MortarsConfirm_DAK
+	MortarsConfirmSounds[3]=`MortarsConfirm_UK
+	
+	ArtilleryConfirmSounds[0]=`ArtilleryConfirm_DAK
+	ArtilleryConfirmSounds[1]=`ArtilleryConfirm_UK
+	ArtilleryConfirmSounds[2]=`ArtilleryConfirm_DAK
+	ArtilleryConfirmSounds[3]=`ArtilleryConfirm_UK
+	
+	RocketsConfirmSounds[0]=`RocketsConfirm_DAK
+	RocketsConfirmSounds[1]=`RocketsConfirm_UK
+	RocketsConfirmSounds[2]=`RocketsConfirm_DAK
+	RocketsConfirmSounds[3]=`RocketsConfirm_UK
+	
+	DenyArtillerySounds[0]=`DenyArtillery_DAK
+	DenyArtillerySounds[1]=`DenyArtillery_UK
+	DenyArtillerySounds[2]=`DenyArtillery_DAK
+	DenyArtillerySounds[3]=`DenyArtillery_UK
+	
+	NoArtillerySounds[0]=`NoArtillery_DAK
+	NoArtillerySounds[1]=`NoArtillery_UK
+	NoArtillerySounds[2]=`NoArtillery_DAK
+	NoArtillerySounds[3]=`NoArtillery_UK
+	
+	TeamSwapAlliesSound=			SoundCue'AUD_RS_VOX_Chatter_Eng_04.General.Misc_Status_SwitchingSides_Cue'
+	TeamSwapAlliesNoObjectiveSound=	SoundCue'AUD_RS_VOX_Chatter_Eng_04.General.Misc_Status_SwitchingSides_Cue'
+	
+	TeamSwapAxisSound=			SoundCue'AUD_VOX_Chatter_GerEng_04_Cue.General.Misc_Status_SwitchingSides_Cue'
+	TeamSwapAxisNoObjectiveSound=	SoundCue'AUD_VOX_Chatter_GerEng_04_Cue.General.Misc_Status_SwitchingSides_Cue'
+	
+	AlliesWinTheme=		SoundCue'Music_RS_USA.U_Victory_Cue'
+	AlliesLossTheme=		SoundCue'Music_RS_USA.U_Loss_Cue'
+	AlliesRoundWinTheme=	SoundCue'Music_RS_USA.U_Trans_2H_Cue'
+	AlliesRoundLostTheme=	SoundCue'Music_RS_USA.U_Trans_2L_Cue'
+	
+	AxisWinTheme=		SoundCue'Music_Ger.G_Victory_Cue'
+	AxisLossTheme=		SoundCue'Music_Sov_Kommissars.R_Komm_L_Cue'
+	AxisRoundWinTheme=	SoundCue'Music_Ger.G_Trans_2H_Cue'
+	AxisRoundLostTheme=	SoundCue'Music_Ger.G_Trans_2L_Cue'
+}
